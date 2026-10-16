@@ -14,6 +14,12 @@ type ShiftResult = {
   balance: number;
 };
 
+type ChartRow = {
+  label: string;
+  value: number;
+  color: string;
+};
+
 function calculateSupplies(
   numProducers: number,
 ): ShiftResult {
@@ -39,16 +45,20 @@ function drawCrewAssignments(result: ShiftResult) {
 }
 
 function drawSupplyChart(result: ShiftResult) {
+  const rows: ChartRow[] = [
+    { label: "Production", value: result.production, color: "#27766b" },
+    { label: "Consumption", value: result.consumption, color: "#a44d23" },
+  ];
+  rows.forEach((row, index) => {
+    ctx.fillStyle = row.color;
+    ctx.fillRect(18, 110 + index * 52, row.value * 14, 20);
+    ctx.fillStyle = "#233e43";
+    ctx.font = "14px system-ui";
+    ctx.fillText(`${row.label}: ${row.value}`, 18, 102 + index * 52);
+  });
   ctx.fillStyle = "#233e43";
   ctx.font = "14px system-ui";
   ctx.fillText(`Producers: ${result.assignedProducers} / 6`, 18, 76);
-  ctx.fillText(`Production: ${result.production}`, 18, 102);
-  ctx.fillStyle = "#27766b";
-  ctx.fillRect(18, 110, result.production * 14, 20);
-  ctx.fillStyle = "#233e43";
-  ctx.fillText(`Consumption: ${result.consumption}`, 18, 154);
-  ctx.fillStyle = "#a44d23";
-  ctx.fillRect(18, 162, result.consumption * 14, 20);
 }
 
 function updateReadout(result: ShiftResult) {
