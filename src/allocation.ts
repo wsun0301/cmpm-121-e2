@@ -15,59 +15,55 @@ type ShiftResult = {
 };
 
 function calculateSupplies(
-  ShiftResult: ShiftResult = {
-    assignedProducers,
-    production: 0,
-    consumption: 0,
-    balance: 0,
-  },
-) {
-  const production = ShiftResult.assignedProducers * 3;
+  numProducers: number,
+): ShiftResult {
+  const production = numProducers * 3;
   const consumption = 6;
   const balance = production - consumption;
   return {
-    shiftResult: {
-      assignedProducers: ShiftResult.assignedProducers,
-      production,
-      consumption,
-      balance,
-    },
+    assignedProducers: numProducers,
+    production,
+    consumption,
+    balance,
   };
 }
 
-function drawCrewAssignments(numProducers: number = assignedProducers) {
+function drawCrewAssignments(result: ShiftResult) {
   for (let i = 0; i < 6; i++) {
-    ctx.fillStyle = i < numProducers ? "#27766b" : "#c9d2c9";
+    ctx.fillStyle = i < result.assignedProducers ? "#27766b" : "#c9d2c9";
     ctx.fillRect(18 + i * 45, 16, 36, 36);
-    ctx.fillStyle = i < numProducers ? "#ffffff" : "#233e43";
+    ctx.fillStyle = i < result.assignedProducers ? "#ffffff" : "#233e43";
     ctx.font = "16px system-ui";
     ctx.fillText(String(i + 1), 31 + i * 45, 40);
   }
 }
 
-function drawSupplyChart() {
-  const { shiftResult: { production, consumption, balance } } =
-    calculateSupplies();
+function drawSupplyChart(result: ShiftResult) {
   ctx.fillStyle = "#233e43";
   ctx.font = "14px system-ui";
-  ctx.fillText(`Producers: ${assignedProducers} / 6`, 18, 76);
-  ctx.fillText(`Production: ${production}`, 18, 102);
+  ctx.fillText(`Producers: ${result.assignedProducers} / 6`, 18, 76);
+  ctx.fillText(`Production: ${result.production}`, 18, 102);
   ctx.fillStyle = "#27766b";
-  ctx.fillRect(18, 110, production * 14, 20);
+  ctx.fillRect(18, 110, result.production * 14, 20);
   ctx.fillStyle = "#233e43";
-  ctx.fillText(`Consumption: ${consumption}`, 18, 154);
+  ctx.fillText(`Consumption: ${result.consumption}`, 18, 154);
   ctx.fillStyle = "#a44d23";
-  ctx.fillRect(18, 162, consumption * 14, 20);
+  ctx.fillRect(18, 162, result.consumption * 14, 20);
+}
+
+function updateReadout(result: ShiftResult) {
   readout.textContent =
-    `Assigned: ${assignedProducers}/6 · Production: ${production} · Consumption: ${consumption} · Balance: ${
-      balance > 0 ? "+" : ""
-    }${balance}`;
+    `Assigned: ${result.assignedProducers}/6 · Production: ${result.production} · Consumption: ${result.consumption} · Balance: ${
+      result.balance > 0 ? "+" : ""
+    }${result.balance}`;
 }
 
 function updateAllocationDisplay() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawCrewAssignments();
-  drawSupplyChart();
+  const result = calculateSupplies(assignedProducers);
+  drawCrewAssignments(result);
+  drawSupplyChart(result);
+  updateReadout(result);
 }
 
 document.querySelector<HTMLButtonElement>("#allocation-less")!.onclick = () => {
